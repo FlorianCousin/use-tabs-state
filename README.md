@@ -25,3 +25,9 @@ When a tab recieves a data change event, it changes its current state via `setSt
 When a tab changes its local state, it emits a data change event.
 
 When a tab initialise the state for the first time, it emits an initialisation event.
+
+### Definition
+
+To emit an event means to write in the localStorage on the specified key, and remove it right away.
+
+To receive an event means to listen to a localStorage change on the specified key (with [event listener](https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event)).

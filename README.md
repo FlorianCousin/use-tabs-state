@@ -38,3 +38,7 @@ It is not recommended to use the shared state in a production usage because
 
 - performance has not been measured,
 - there is no unit test.
+
+## Links
+
+- [npm](https://www.npmjs.com/package/@florian-cousin/use-tabs-state)

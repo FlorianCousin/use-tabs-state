@@ -4,6 +4,7 @@
   "description": "Hook for React state that is shared through all tabs",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

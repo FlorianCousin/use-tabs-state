@@ -1,6 +1,6 @@
 {
   "name": "@florian-cousin/use-tabs-state",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hook for React state that is shared through all tabs",
   "main": "dist/useTabsState.js",
   "types": "dist/useTabsState.d.ts",

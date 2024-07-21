@@ -16,8 +16,8 @@ localStorage and events on localStorage change are used to synchronise state acr
 
 Each state listens to
 
-- an initialisation event (i.e. a new tab using the shared state)
-- a data change event
+- an initialisation event (i.e. a new tab using the shared state),
+- a data change event.
 
 When a tab recieves an initialisation event, it sends its current local state.
 When a tab recieves a data change event, it changes its current state via `setState` (it triggers a rerender).

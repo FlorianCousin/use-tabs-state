@@ -31,3 +31,10 @@ When a tab initialise the state for the first time, it emits an initialisation e
 To emit an event means to write in the localStorage on the specified key, and remove it right away.
 
 To receive an event means to listen to a localStorage change on the specified key (with [event listener](https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event)).
+
+## Usage advice
+
+It is not recommended to use the shared state in a production usage because
+
+- performance has not been measured,
+- there is no unit test.

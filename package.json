@@ -23,5 +23,12 @@
   "bugs": {
     "url": "https://github.com/FlorianCousin/use-tabs-state/issues"
   },
-  "homepage": "https://github.com/FlorianCousin/use-tabs-state#readme"
+  "homepage": "https://github.com/FlorianCousin/use-tabs-state#readme",
+  "dependencies": {
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.5",
+    "typescript": "^5.5.3"
+  }
 }

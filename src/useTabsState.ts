@@ -1,85 +1,51 @@
 import { Dispatch, SetStateAction, useLayoutEffect, useState } from "react";
-
-type Listener<Value> = (value: Value) => void;
-type StorageListener = Listener<StorageEvent>;
+import { addListenerOnStorage, MessageType, notifyWithLocalStorage, removeListenerOnStorage } from "./messages";
 
 export type InitialState<State> = State | (() => State);
 export type SetState<State> = Dispatch<SetStateAction<State>>;
 export type UseStateReturn<State> = [State, SetState<State>];
 
-export function useTabsState<State>(initialState: InitialState<State>, storageKey: string): UseStateReturn<State> {
-  const [state, setState]: UseStateReturn<State> = useState<State>(initialState);
+export function useTabsState<State>(initialState: InitialState<State>, key: string): UseStateReturn<State> {
+  const useStateReturn: UseStateReturn<State> = useState<State>(initialState);
+  const [state, setState]: UseStateReturn<State> = useStateReturn;
 
-  useRegisterInitStorageListener<State>(storageKey, state);
+  useRegisterInitStorageListener<State>(key, state);
 
-  useRegisterStateStorageListener<State>(storageKey, setState);
+  useRegisterStateStorageListener<State>(key, setState);
 
-  useNotifyInitialisationForOtherTabs(storageKey);
+  useNotifyInitialisationForOtherTabs(key);
 
-  const useStateReturn: UseStateReturn<State> = [state, setState];
-  const setStateInStorage = buildSetStateInStorage(useStateReturn, storageKey);
+  const setStateAndNotify = buildSetStateAndNotify(useStateReturn, key);
 
-  return [state, setStateInStorage];
+  return [state, setStateAndNotify];
 }
 
-function useRegisterInitStorageListener<State>(storageKey: string, state: State): void {
+function useRegisterInitStorageListener<State>(key: string, state: State): void {
   useLayoutEffect(() => {
-    const initStorageKey: string = buildInitStorageKey(storageKey);
-    const onInitStorageChange = () => {
-      notifyWithLocalStorage(storageKey, state);
-    };
-    const registeredListener = addListenerOnStorageKey(initStorageKey, onInitStorageChange);
-    return () => window.removeEventListener("storage", registeredListener);
+    const onNewTabInitRequest = () => notifyWithLocalStorage(key, MessageType.DATA_INITIALISATION, state);
+    const registeredListener = addListenerOnStorage(key, MessageType.ASK_FOR_INITIALISATION, onNewTabInitRequest);
+    return () => removeListenerOnStorage(registeredListener);
   }, [state]);
 }
 
-function useRegisterStateStorageListener<State>(storageKey: string, setState: SetState<State>) {
+function useRegisterStateStorageListener<State>(key: string, setState: SetState<State>) {
   useLayoutEffect(() => {
-    const registeredListener = addListenerOnStorageKey(storageKey, setState);
-    return () => window.removeEventListener("storage", registeredListener);
+    const registeredListener = addListenerOnStorage(key, MessageType.DATA_UPDATE, setState);
+    return () => removeListenerOnStorage(registeredListener);
   }, []);
 }
 
-function useNotifyInitialisationForOtherTabs(storageKey: string): void {
+function useNotifyInitialisationForOtherTabs(key: string): void {
   useLayoutEffect(() => {
-    const initStorageKey: string = buildInitStorageKey(storageKey);
-    notifyWithLocalStorage(initStorageKey, "storage initialisation");
+    notifyWithLocalStorage(key, MessageType.ASK_FOR_INITIALISATION, "storage initialisation");
   }, []);
 }
 
-function buildSetStateInStorage<State>(
-  [previousState, setState]: UseStateReturn<State>,
-  storageKey: string
-): SetState<State> {
+function buildSetStateAndNotify<State>([previousState, setState]: UseStateReturn<State>, key: string): SetState<State> {
   return (stateUpdater: SetStateAction<State>) => {
     const stateUpdaterIsFunction = stateUpdater instanceof Function;
     const newState: State = stateUpdaterIsFunction ? stateUpdater(previousState) : stateUpdater;
-    notifyWithLocalStorage(storageKey, newState);
+    notifyWithLocalStorage(key, MessageType.DATA_UPDATE, newState);
     setState(stateUpdater);
   };
-}
-
-function notifyWithLocalStorage<Value>(storageKey: string, value: Value): void {
-  localStorage.setItem(storageKey, JSON.stringify(value));
-  localStorage.removeItem(storageKey);
-}
-
-function addListenerOnStorageKey<Value>(storageKey: string, listener: Listener<Value>): StorageListener {
-  const wrappedListener = wrapListenerForKey<Value>(storageKey, listener);
-  window.addEventListener("storage", wrappedListener);
-  return wrappedListener;
-}
-
-function wrapListenerForKey<Value>(storageKey: string, listener: Listener<Value>): StorageListener {
-  return ({ key, newValue }: StorageEvent) => {
-    const eventIsOnThisState: boolean = key === storageKey && newValue !== null;
-    if (eventIsOnThisState) {
-      const newValueParsed: Value = JSON.parse(newValue!);
-      listener(newValueParsed);
-    }
-  };
-}
-
-function buildInitStorageKey(storageKey: string): string {
-  return `${storageKey}-init`;
 }

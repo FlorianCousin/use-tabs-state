@@ -1,7 +1,7 @@
 import { DependencyList, MutableRefObject, useLayoutEffect, useRef } from "react";
 import { addListenerOnStorage, Listener, notify, removeListenerOnStorage } from "./messages";
 import { SetState } from "./useTabsState";
-import { EventType } from "./eventsTypes";
+import { allEventsTypes, EventType } from "./eventsTypes";
 
 interface ActionOnEventParams<State> {
   key: string;
@@ -51,12 +51,6 @@ function getActionOnEvent<State>(
       return ({ setState }) => [setState, [setState]];
   }
 }
-
-const allEventsTypes: EventType[] = [
-  EventType.DATA_UPDATE,
-  EventType.DATA_FOR_INITIALISATION,
-  EventType.ASK_FOR_INITIALISATION,
-];
 
 export function useAllEventsSubscription<State>(key: string, state: State, setState: SetState<State>) {
   const isAlreadyInitialisedRef: MutableRefObject<boolean> = useRef(false);

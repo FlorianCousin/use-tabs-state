@@ -4,6 +4,12 @@ export enum EventType {
   DATA_UPDATE = "DATA_UPDATE",
 }
 
+export const allEventsTypes: EventType[] = [
+  EventType.DATA_UPDATE,
+  EventType.DATA_FOR_INITIALISATION,
+  EventType.ASK_FOR_INITIALISATION,
+];
+
 function getSuffix(messageType: EventType): string {
   switch (messageType) {
     case EventType.ASK_FOR_INITIALISATION:

@@ -1,4 +1,4 @@
-type Listener<Value> = (value: Value) => void;
+export type Listener<Value> = (value: Value) => void;
 type StorageListener = Listener<StorageEvent>;
 
 export enum MessageType {

@@ -3,9 +3,9 @@ import { notify } from "./messages";
 import { useAllEventsSubscription } from "./useAllEventsSubscription";
 import { EventType } from "./eventsTypes";
 
-export type InitialState<State> = State | (() => State);
 export type SetState<State> = Dispatch<SetStateAction<State>>;
-export type UseStateReturn<State> = [State, SetState<State>];
+type UseStateReturn<State> = [State, SetState<State>];
+type InitialState<State> = State | (() => State);
 
 export function useTabsState<State>(initialState: InitialState<State>, key: string): UseStateReturn<State> {
   const useStateReturn: UseStateReturn<State> = useState<State>(initialState);

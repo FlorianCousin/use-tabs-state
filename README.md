@@ -36,7 +36,7 @@ To receive an event means to listen to a localStorage change on the specified ke
 
 It is not recommended to use the shared state in a production usage because
 
-- performance has not been measured (especially when there are more than 2 tabs),
+- performance has not been measured,
 - there is no unit test.
 
 ## Links

@@ -1,22 +1,22 @@
-import { DependencyList, useLayoutEffect } from "react";
+import { DependencyList, MutableRefObject, useLayoutEffect, useRef } from "react";
 import { addListenerOnStorage, Listener, notify, removeListenerOnStorage } from "./messages";
 import { SetState } from "./useTabsState";
 import { EventType } from "./eventsTypes";
 
-let stateAlreadyInitialised: boolean = false;
-
-export interface ActionOnEventParams<State> {
+interface ActionOnEventParams<State> {
   key: string;
   state: State;
   setState: SetState<State>;
+  isAlreadyInitialisedRef: MutableRefObject<boolean>;
 }
 
 function notifyOwnDataForInitialisation<State>({
   key,
   state,
+  isAlreadyInitialisedRef,
 }: ActionOnEventParams<State>): [Listener<State>, DependencyList] {
   const listener = () => {
-    stateAlreadyInitialised = true;
+    isAlreadyInitialisedRef.current = true;
     notify(key, EventType.DATA_FOR_INITIALISATION, state);
   };
 
@@ -26,15 +26,16 @@ function notifyOwnDataForInitialisation<State>({
 
 function initialiseOwnStateIfNotAlreadyInitialised<State>({
   setState,
+  isAlreadyInitialisedRef,
 }: ActionOnEventParams<State>): [Listener<State>, DependencyList] {
-  const listener = (eventDate: State) => {
-    if (!stateAlreadyInitialised) {
-      setState(eventDate);
-      stateAlreadyInitialised = true;
+  const listener = (eventData: State) => {
+    if (!isAlreadyInitialisedRef.current) {
+      setState(eventData);
+      isAlreadyInitialisedRef.current = true;
     }
   };
 
-  const dependencies = [setState];
+  const dependencies = [setState, isAlreadyInitialisedRef.current];
   return [listener, dependencies];
 }
 
@@ -57,7 +58,11 @@ const allEventsTypes: EventType[] = [
   EventType.ASK_FOR_INITIALISATION,
 ];
 
-export function useAllEventsSubscription<State>(actionOnEventParams: ActionOnEventParams<State>) {
+export function useAllEventsSubscription<State>(key: string, state: State, setState: SetState<State>) {
+  const isAlreadyInitialisedRef: MutableRefObject<boolean> = useRef(false);
+
+  const actionOnEventParams: ActionOnEventParams<State> = { key, state, setState, isAlreadyInitialisedRef };
+
   allEventsTypes.forEach(messageType => registerActionForMessage(actionOnEventParams, messageType));
 }
 

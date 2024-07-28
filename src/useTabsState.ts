@@ -11,11 +11,7 @@ export function useTabsState<State>(initialState: InitialState<State>, key: stri
   const useStateReturn: UseStateReturn<State> = useState<State>(initialState);
   const [state, setState]: UseStateReturn<State> = useStateReturn;
 
-  useAllEventsSubscription({
-    key,
-    state,
-    setState,
-  });
+  useAllEventsSubscription(key, state, setState);
 
   useNotifyInitialisationForOtherTabs(key);
 

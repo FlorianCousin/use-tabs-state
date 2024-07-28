@@ -3,7 +3,7 @@ type StorageListener = Listener<StorageEvent>;
 
 export enum MessageType {
   ASK_FOR_INITIALISATION = "ASK_FOR_INITIALISATION",
-  DATA_INITIALISATION = "DATA_INITIALISATION",
+  DATA_FOR_INITIALISATION = "DATA_FOR_INITIALISATION",
   DATA_UPDATE = "DATA_UPDATE",
 }
 
@@ -11,7 +11,7 @@ function getSuffix(messageType: MessageType): string {
   switch (messageType) {
     case MessageType.ASK_FOR_INITIALISATION:
       return "ask-for-initialisation";
-    case MessageType.DATA_INITIALISATION:
+    case MessageType.DATA_FOR_INITIALISATION:
       return "data_initialisation";
     case MessageType.DATA_UPDATE:
       return "data_update";

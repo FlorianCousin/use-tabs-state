@@ -1,27 +1,7 @@
+import { computeStorageKeyForEvent, EventType } from "./eventsTypes";
+
 export type Listener<Value> = (value: Value) => void;
 type StorageListener = Listener<StorageEvent>;
-
-export enum MessageType {
-  ASK_FOR_INITIALISATION = "ASK_FOR_INITIALISATION",
-  DATA_FOR_INITIALISATION = "DATA_FOR_INITIALISATION",
-  DATA_UPDATE = "DATA_UPDATE",
-}
-
-function getSuffix(messageType: MessageType): string {
-  switch (messageType) {
-    case MessageType.ASK_FOR_INITIALISATION:
-      return "ask-for-initialisation";
-    case MessageType.DATA_FOR_INITIALISATION:
-      return "data_initialisation";
-    case MessageType.DATA_UPDATE:
-      return "data_update";
-  }
-}
-
-function computeStorageKeyForMessage(key: string, messageType: MessageType) {
-  const suffix: string = getSuffix(messageType);
-  return `${key}-${suffix}`;
-}
 
 function wrapListenerForKey<Value>(storageKey: string, listener: Listener<Value>): StorageListener {
   return ({ key, newValue }: StorageEvent) => {
@@ -35,10 +15,10 @@ function wrapListenerForKey<Value>(storageKey: string, listener: Listener<Value>
 
 export function addListenerOnStorage<Value>(
   key: string,
-  messageType: MessageType,
+  messageType: EventType,
   listener: Listener<Value>
 ): StorageListener {
-  const storageKey: string = computeStorageKeyForMessage(key, messageType);
+  const storageKey: string = computeStorageKeyForEvent(key, messageType);
   const wrappedListener = wrapListenerForKey<Value>(storageKey, listener);
   window.addEventListener("storage", wrappedListener);
   return wrappedListener;
@@ -48,8 +28,8 @@ export function removeListenerOnStorage(storageListener: StorageListener): void 
   window.removeEventListener("storage", storageListener);
 }
 
-export function notifyWithLocalStorage<Value>(key: string, messageType: MessageType, value: Value): void {
-  const storageKey: string = computeStorageKeyForMessage(key, messageType);
+export function notify<Value>(key: string, messageType: EventType, value: Value): void {
+  const storageKey: string = computeStorageKeyForEvent(key, messageType);
   localStorage.setItem(storageKey, JSON.stringify(value));
   localStorage.removeItem(storageKey);
 }

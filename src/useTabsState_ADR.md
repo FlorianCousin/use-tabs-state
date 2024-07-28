@@ -33,8 +33,3 @@ When a new tab wants to use the state, it emits a state initialisation on the sp
 If no other tab is using the shared state, then nothing occurs.
 If another tab is using the shared state, then it receives the initialisation event and sends back the current state it holds.
 Finally, the initialising tab receives the shared state and updates its local one.
-
-## Drawbacks
-
-Let n be the number of tabs that are using the shared state.
-When another tab appears and uses the shared state, then every existing tab sends its current state, so every existing tab rerender n-1 times.
